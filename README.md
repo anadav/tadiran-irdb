@@ -49,8 +49,17 @@ These quirks come from the source data and are kept unchanged:
 
 - In `Dry` mode the four fan speeds send the same code at each temperature. The fan setting
   probably doesn't apply in dry mode.
-- `Cool_High_28` and `Cool_High_29` are identical, which is probably a capture error in the
-  source. If one of them sets the wrong temperature, that's why.
+- Six SmartIR captures are broken. Decoding the protocol (IRremoteESP8266's
+  [Amcor](https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Amcor.h)
+  format) shows:
+  - `Cool_Auto_17`, `Auto_Auto_20` and `Fan_Mid_23` are bit-shifted and fail the checksum,
+    so the AC ignores them.
+  - `Cool_High_17` and `Cool_High_18` are swapped.
+  - `Cool_High_28` actually sends 29 °C.
+- `Fan_Auto_*` actually sends Low fan; the real remote has no Auto speed in Fan mode.
+
+[tadiran-remote](https://github.com/anadav/tadiran-remote) builds the codes from the decoded
+protocol instead, so it doesn't have these problems.
 
 ## Regenerating
 
